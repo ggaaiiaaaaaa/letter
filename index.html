@@ -162,6 +162,29 @@
             color: #7b6b8a;
         }
 
+        .letter .open-mail-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #967bb6, #b8a9c9);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(150, 123, 182, 0.4);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
+        }
+
+        .letter .open-mail-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(150, 123, 182, 0.5);
+        }
+
         /* Controls */
         .controls {
             position: fixed;
@@ -758,10 +781,18 @@
         <!-- Hidden Letter -->
         <div class="letter" id="letter">
             <h1>HAPPY 14th MONTHSARY MY LABIDABSKIE😘😘😘</h1>
-            <p>1 year and 14 months with you and still counting, God truly blessed me with you. In a world full of chaos, you are my peace, my comfort, and my light. I don't know what I did to deserve you, but I'll spend forever loving you with all that I am. No matter what, I will always hold you close, cherish you, and stand by your side. You are my greatest privilege, my answered prayer, and the love I never knew I needed but now I can't imagine my life without. You know and i know na how much I Love You and how much I want you to be my forever.</p>
+            <p>1 year and 14 months with you and still counting, God truly blessed me with you. In a world full of
+                chaos, you are my peace, my comfort, and my light. I don't know what I did to deserve you, but I'll
+                spend forever loving you with all that I am. No matter what, I will always hold you close, cherish you,
+                and stand by your side. You are my greatest privilege, my answered prayer, and the love I never knew I
+                needed but now I can't imagine my life without. You know and i know na how much I Love You and how much
+                I want you to be my forever.</p>
             <p>You will be my first and my last. </p>
             <p>I LOVE YOUUU SOO MUCHH MY LABLAB😘😘😘😘😘</p>
             <p class="signature">Forever yours ♡</p>
+            <div style="text-align: center;">
+                <button class="open-mail-btn" id="openMailBtn">Click me 💌</button>
+            </div>
         </div>
     </div>
 
@@ -945,17 +976,17 @@
             e.preventDefault();
         }
 
-        // Reveal letter, then show Valentine invitation
+        // Reveal letter
         function revealLetter() {
             letter.classList.add('visible');
             replayBtn.classList.remove('hidden');
-
-            // Show the Valentine invitation after a delay
-            setTimeout(() => {
-                invitationOverlay.classList.add('visible');
-                createInvHearts();
-            }, 3000);
         }
+
+        // "Click me" button on the letter opens the Valentine invitation
+        document.getElementById('openMailBtn').addEventListener('click', () => {
+            invitationOverlay.classList.add('visible');
+            createInvHearts();
+        });
 
         // Replay function
         function replay() {
