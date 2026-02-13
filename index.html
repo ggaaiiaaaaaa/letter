@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter For You</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e8dff5 0%, #b8a9c9 50%, #e8dff5 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Particles Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Photo Gallery */
+        .photo-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo {
+            position: absolute;
+            width: 200px;
+            height: 250px;
+            background: white;
+            padding: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: blur(0.5px);
+            z-index: 10;
+        }
+
+        .photo:active {
+            cursor: grabbing;
+        }
+
+        .photo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+            filter: blur(0);
+            z-index: 100;
+        }
+
+        .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo.scattered {
+            filter: blur(0);
+        }
+
+        /* Hidden Letter */
+        .letter {
+            position: absolute;
+            max-width: 600px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease-out;
+            z-index: 1001;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .letter.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .letter h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: #967bb6;
+            margin-bottom: 30px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .letter p {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #4a3f5c;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .letter .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 30px;
+            color: #7b6b8a;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #967bb6;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(150, 123, 182, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+            background: white;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Instruction Text */
+        .instruction {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.8;
+            transition: opacity 0.5s ease;
+        }
+
+        .instruction.hidden {
+            opacity: 0;
+        }
+
+        .instruction h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .instruction p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Music Player */
+        .music-player {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 1000;
+        }
+
+        .music-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #967bb6;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(150, 123, 182, 0.3);
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .photo {
+                width: 150px;
+                height: 180px;
+            }
+
+            .letter {
+                padding: 30px 25px;
+            }
+
+            .letter h1 {
+                font-size: 2em;
+            }
+
+            .letter p {
+                font-size: 1em;
+            }
+
+            .instruction h2 {
+                font-size: 1.5em;
+            }
+
+            .instruction p {
+                font-size: 0.9em;
+            }
+
+            .controls {
+                bottom: 20px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+
+            .music-player {
+                top: 20px;
+                right: 20px;
+            }
+
+            .music-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8dff5 0%, #b8a9c9 50%, #e8dff5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: #967bb6;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ===== Valentine Invitation Mail ===== */
+        .invitation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8dff5 0%, #d4c5f0 30%, #b8a9c9 60%, #e8dff5 100%);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        .invitation-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .invitation-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .inv-heart {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            animation: invHeartFloat 6s infinite ease-in-out;
+        }
+
+        @keyframes invHeartFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Envelope */
+        .envelope-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: envelopeBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes envelopeBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .envelope {
+            position: relative;
+            width: 360px;
+            height: 240px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(100, 60, 140, 0.25);
+            overflow: visible;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.02);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #d4c5f0, #b8a9c9);
+            clip-path: polygon(0 0, 50% 100%, 100% 0);
+            transform-origin: top center;
+            transition: transform 0.6s ease;
+            z-index: 3;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .envelope-body::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #e8dff5, #d4c5f0);
+            clip-path: polygon(0 100%, 50% 20%, 100% 100%);
+            z-index: 2;
+        }
+
+        .envelope-stamp {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 50px;
+            height: 60px;
+            background: linear-gradient(135deg, #f0e6ff, #d4c5f0);
+            border: 2px dashed #b8a9c9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 4;
+        }
+
+        .envelope-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .envelope-label span {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.1em;
+            color: #7b6b8a;
+        }
+
+        .open-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            color: #b8a9c9;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Invitation Card (pops out of envelope) */
+        .invitation-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            width: 420px;
+            max-width: 90vw;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 30px 80px rgba(100, 60, 140, 0.3);
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 20001;
+            border: 1px solid rgba(200, 180, 220, 0.4);
+        }
+
+        .invitation-card.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+
+        .invitation-card .heart-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: heartbeat 1.2s infinite;
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            14% {
+                transform: scale(1.15);
+            }
+
+            28% {
+                transform: scale(1);
+            }
+
+            42% {
+                transform: scale(1.1);
+            }
+
+            56% {
+                transform: scale(1);
+            }
+        }
+
+        .invitation-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            color: #967bb6;
+            margin-bottom: 10px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .invitation-card .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1em;
+            color: #7b6b8a;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .invitation-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-yes {
+            padding: 16px 50px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #967bb6, #b8a9c9);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(150, 123, 182, 0.4);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(150, 123, 182, 0.5);
+        }
+
+        .btn-no {
+            padding: 14px 35px;
+            border: 2px solid rgba(150, 123, 182, 0.4);
+            border-radius: 50px;
+            background: transparent;
+            color: #967bb6;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .btn-no:hover {
+            transform: translate(var(--dodge-x, 0), var(--dodge-y, 0));
+        }
+
+        /* Confetti */
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            z-index: 30000;
+            pointer-events: none;
+            animation: confettiFall 2.5s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .envelope {
+                width: 280px;
+                height: 190px;
+            }
+
+            .invitation-card {
+                padding: 35px 25px;
+            }
+
+            .invitation-card h2 {
+                font-size: 1.7em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Valentine Invitation Overlay -->
+    <div class="invitation-overlay" id="invitationOverlay">
+        <div class="invitation-hearts" id="invHearts"></div>
+        <div class="envelope-wrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-flap"></div>
+                <div class="envelope-body"></div>
+                <div class="envelope-stamp">💌</div>
+                <div class="envelope-label">
+                    <span>For You ♡</span>
+                </div>
+            </div>
+            <div class="open-text">Tap to open</div>
+        </div>
+    </div>
+
+    <!-- Invitation Card -->
+    <div class="invitation-card" id="invitationCard">
+        <div class="heart-icon">💜</div>
+        <h2>Will you be my Valentine?</h2>
+        <p class="subtitle">Every moment with you feels like a dream I never want to wake up from...</p>
+        <div class="invitation-buttons">
+            <button class="btn-yes" id="btnYes">Yes! 💜</button>
+            <button class="btn-no" id="btnNo">No</button>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading">
+        <div class="loading-text">Loading memories...</div>
+    </div>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Music Player -->
+    <div class="music-player">
+        <button class="music-btn" id="musicBtn" title="Play Music">
+            ▶
+        </button>
+    </div>
+
+    <!-- Instruction -->
+    <div class="instruction" id="instruction">
+        <h2>Drag the photos to scatter them</h2>
+        <p>Move each memory to reveal what's hidden beneath...</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="photo-container" id="photoContainer">
+            <!-- Photos will be dynamically generated -->
+        </div>
+
+        <!-- Hidden Letter -->
+        <div class="letter" id="letter">
+            <h1>HAPPY 14th MONTHSARY MY LABIDABSKIE😘😘😘</h1>
+            <p>1 year and 14 months with you and still counting, God truly blessed me with you. In a world full of chaos, you are my peace, my comfort, and my light. I don't know what I did to deserve you, but I'll spend forever loving you with all that I am. No matter what, I will always hold you close, cherish you, and stand by your side. You are my greatest privilege, my answered prayer, and the love I never knew I needed but now I can't imagine my life without. You know and i know na how much I Love You and how much I want you to be my forever.</p>
+            <p>You will be my first and my last. </p>
+            <p>I LOVE YOUUU SOO MUCHH MY LABLAB😘😘😘😘😘</p>
+            <p class="signature">Forever yours ♡</p>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn hidden" id="replayBtn">Replay</button>
+    </div>
+
+    <!-- Audio - Araw Araw by Ben&Ben -->
+    <audio id="bgMusic" loop>
+        <source src="ikaw-at-ako.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Photo data with your uploaded images
+        const photoData = [
+            'images/1cae70aa-aee0-437b-89ec-d6430c4b683b.jpg',
+            'images/6caee4fb-55c1-4b9b-80a7-4a39721ae5c7.jpg',
+            'images/6fa64953-fdc0-4fd8-89df-da61dcc879f7.jpg',
+            'images/9aadd820-de89-45ac-b4fb-8725a14b1915.jpg',
+            'images/62a69af3-87c4-4691-93f4-93667eaea41f.jpg',
+            'images/88be8492-2ec0-414a-9765-c025adf76eea.jpg',
+            'images/92b7ef1c-5e7a-45a9-8982-84230811d49e.jpg',
+            'images/313d4daf-b642-41a4-beb1-2e00cb8df4ea.jpg',
+            'images/2783ccfa-632b-4e38-8ba3-05451b910bfe.jpg',
+            'images/3802f64b-5a2f-4856-864a-b7592c7536f6.jpg',
+            'images/9246e2bb-9290-432d-92d5-11a23d68e644.jpg',
+            'images/5118410b-7d87-42ac-a9c4-fd580eb514e7.jpg',
+            'images/bf157d53-35f8-4969-9ad6-def5a928d062.jpg',
+            'images/e8ee030c-2ea1-416e-85c8-01a45e4a6fbf.jpg',
+            'images/eddd6428-b73d-4173-bab9-2daabe8b338c.jpg',
+            'images/f16f608f-a5c0-49ce-9160-cf4dd2602d13.jpg'
+        ];
+
+        const photoContainer = document.getElementById('photoContainer');
+        const letter = document.getElementById('letter');
+        const replayBtn = document.getElementById('replayBtn');
+        const musicBtn = document.getElementById('musicBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        const loading = document.querySelector('.loading');
+        const instruction = document.getElementById('instruction');
+
+        let photos = [];
+        let isDragging = false;
+        let currentPhoto = null;
+        let scatteredCount = 0;
+        let photosInitialPositions = [];
+
+        // Generate floating hearts
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = '♡';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heart.style.animationDuration = (10 + Math.random() * 10) + 's';
+                particles.appendChild(heart);
+            }
+        }
+
+        // Create photos
+        function createPhotos() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+
+            photoData.forEach((src, index) => {
+                const photo = document.createElement('div');
+                photo.className = 'photo';
+                photo.dataset.index = index;
+                photo.dataset.scattered = 'false';
+
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Memory ${index + 1}`;
+                photo.appendChild(img);
+
+                // Random position in cluster
+                const angle = (Math.PI * 2 * index) / photoData.length;
+                const r = radius * (0.5 + Math.random() * 0.5);
+                const x = centerX + Math.cos(angle) * r - 100;
+                const y = centerY + Math.sin(angle) * r - 125;
+
+                photo.style.left = x + 'px';
+                photo.style.top = y + 'px';
+                photo.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+                photo.style.zIndex = 10 + index;
+
+                // Store initial position
+                photosInitialPositions[index] = {
+                    x: x,
+                    y: y,
+                    rotation: (Math.random() - 0.5) * 30
+                };
+
+                // Animation delay
+                photo.style.opacity = '0';
+                setTimeout(() => {
+                    photo.style.transition = 'opacity 0.8s ease-out';
+                    photo.style.opacity = '1';
+                }, index * 100);
+
+                // Drag functionality
+                photo.addEventListener('mousedown', startDrag);
+                photo.addEventListener('touchstart', startDrag);
+
+                photoContainer.appendChild(photo);
+                photos.push(photo);
+            });
+        }
+
+        // Check if photo has been moved significantly from initial position
+        function hasBeenMoved(photo, currentX, currentY) {
+            const index = parseInt(photo.dataset.index);
+            const initial = photosInitialPositions[index];
+            const distance = Math.sqrt(
+                Math.pow(currentX - initial.x, 2) +
+                Math.pow(currentY - initial.y, 2)
+            );
+            return distance > 150; // Must move at least 150px to count as scattered
+        }
+
+        // Drag functions
+        function startDrag(e) {
+            isDragging = true;
+            currentPhoto = e.target.closest('.photo');
+            currentPhoto.style.zIndex = 1000;
+
+            const moveHandler = (e) => {
+                if (!isDragging) return;
+
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+
+                currentPhoto.style.left = (clientX - 100) + 'px';
+                currentPhoto.style.top = (clientY - 125) + 'px';
+            };
+
+            const endHandler = () => {
+                if (currentPhoto) {
+                    const rect = currentPhoto.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+
+                    // Check if this photo has been moved enough and mark as scattered
+                    if (currentPhoto.dataset.scattered === 'false' &&
+                        hasBeenMoved(currentPhoto, parseFloat(currentPhoto.style.left), parseFloat(currentPhoto.style.top))) {
+                        currentPhoto.dataset.scattered = 'true';
+                        currentPhoto.classList.add('scattered');
+                        scatteredCount++;
+
+                        // Hide instruction after first drag
+                        if (scatteredCount === 1) {
+                            instruction.classList.add('hidden');
+                        }
+
+                        // Check if all photos are scattered
+                        if (scatteredCount === photoData.length) {
+                            setTimeout(() => {
+                                revealLetter();
+                            }, 500);
+                        }
+                    }
+                }
+
+                isDragging = false;
+                document.removeEventListener('mousemove', moveHandler);
+                document.removeEventListener('touchmove', moveHandler);
+                document.removeEventListener('mouseup', endHandler);
+                document.removeEventListener('touchend', endHandler);
+            };
+
+            document.addEventListener('mousemove', moveHandler);
+            document.addEventListener('touchmove', moveHandler);
+            document.addEventListener('mouseup', endHandler);
+            document.addEventListener('touchend', endHandler);
+
+            e.preventDefault();
+        }
+
+        // Reveal letter, then show Valentine invitation
+        function revealLetter() {
+            letter.classList.add('visible');
+            replayBtn.classList.remove('hidden');
+
+            // Show the Valentine invitation after a delay
+            setTimeout(() => {
+                invitationOverlay.classList.add('visible');
+                createInvHearts();
+            }, 3000);
+        }
+
+        // Replay function
+        function replay() {
+            scatteredCount = 0;
+            letter.classList.remove('visible');
+            replayBtn.classList.add('hidden');
+            instruction.classList.remove('hidden');
+
+            // Reset photos
+            photos.forEach((photo, index) => {
+                photo.dataset.scattered = 'false';
+                photo.classList.remove('scattered');
+                photo.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                photo.style.left = photosInitialPositions[index].x + 'px';
+                photo.style.top = photosInitialPositions[index].y + 'px';
+                photo.style.transform = `rotate(${photosInitialPositions[index].rotation}deg)`;
+                photo.style.opacity = '1';
+            });
+
+            // Remove transition after animation
+            setTimeout(() => {
+                photos.forEach(photo => {
+                    photo.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+            }, 800);
+        }
+
+        // Music control
+        let isPlaying = false;
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicBtn.textContent = '▶';
+            } else {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                musicBtn.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Event listeners
+        replayBtn.addEventListener('click', replay);
+
+        // ===== Valentine Invitation Logic =====
+        const invitationOverlay = document.getElementById('invitationOverlay');
+        const invitationCard = document.getElementById('invitationCard');
+        const envelope = document.getElementById('envelope');
+        const btnYes = document.getElementById('btnYes');
+        const btnNo = document.getElementById('btnNo');
+
+        // Create floating hearts for invitation
+        function createInvHearts() {
+            const container = document.getElementById('invHearts');
+            container.innerHTML = '';
+            const hearts = ['💜', '💕', '💗', '✨', '💜', '♡', '💕'];
+            for (let i = 0; i < 20; i++) {
+                const h = document.createElement('div');
+                h.className = 'inv-heart';
+                h.textContent = hearts[i % hearts.length];
+                h.style.left = Math.random() * 100 + '%';
+                h.style.animationDelay = Math.random() * 6 + 's';
+                h.style.animationDuration = (4 + Math.random() * 4) + 's';
+                h.style.fontSize = (16 + Math.random() * 20) + 'px';
+                container.appendChild(h);
+            }
+        }
+
+        // Envelope click → open and show card
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('open');
+            setTimeout(() => {
+                invitationCard.classList.add('visible');
+            }, 400);
+        });
+
+        // "No" button dodges the cursor
+        btnNo.addEventListener('mouseover', () => {
+            const x = (Math.random() - 0.5) * 300;
+            const y = (Math.random() - 0.5) * 200;
+            btnNo.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        btnNo.addEventListener('click', () => {
+            btnNo.textContent = 'Wrong answer! 😂';
+            setTimeout(() => { btnNo.textContent = 'No'; }, 1200);
+        });
+
+        // Confetti burst
+        function launchConfetti() {
+            const colors = ['#967bb6', '#b8a9c9', '#d4c5f0', '#e8dff5', '#f0e6ff', '#ff9ff3', '#fff'];
+            for (let i = 0; i < 80; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.top = '-10px';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.width = (6 + Math.random() * 8) + 'px';
+                piece.style.height = (6 + Math.random() * 8) + 'px';
+                piece.style.animationDelay = Math.random() * 0.8 + 's';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                document.body.appendChild(piece);
+                setTimeout(() => piece.remove(), 3500);
+            }
+        }
+
+        // "Yes" button → confetti celebration
+        btnYes.addEventListener('click', () => {
+            launchConfetti();
+            btnYes.textContent = 'Yay! 🎉💜';
+            btnYes.style.pointerEvents = 'none';
+            btnNo.style.display = 'none';
+
+            // Change the card message
+            invitationCard.querySelector('h2').textContent = 'I love you! 💜';
+            invitationCard.querySelector('.subtitle').textContent = 'Happy Valentine\'s Day, my love! Forever yours... ♡';
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loading.classList.add('hidden');
+            }, 1500);
+
+            createParticles();
+            createPhotos();
+        });
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (scatteredCount === 0) {
+                    photos.forEach(photo => photo.remove());
+                    photos = [];
+                    photosInitialPositions = [];
+                    createPhotos();
+                }
+            }, 250);
+        });
+    </script>
+</body>
+
+</html>
